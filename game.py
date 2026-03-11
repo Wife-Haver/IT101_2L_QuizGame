@@ -2,6 +2,8 @@ import tkinter as tk
 import pygame
 
 from player import Player
+from enemy import Enemy
+from bullet import Bullet
 
 WHITE = (255, 255, 255)
 FPS = 60
@@ -24,6 +26,15 @@ class QuizGame:
         self.playerSpriteGroup = pygame.sprite.Group()
         self.player = Player(400, 300)
         self.playerSpriteGroup.add(self.player)
+        
+        self.enemiesSpriteGroup = pygame.sprite.Group()
+        self.init_enemies()
+    
+    def init_enemies(self):
+        amtOfEnemies = 4
+        for i in range(amtOfEnemies):
+            self.enemy = Enemy()
+            self.enemiesSpriteGroup.add(self.enemy)
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -35,6 +46,8 @@ class QuizGame:
 
         self.player.handle_input(keys)
         self.playerSpriteGroup.update()
+
+        #hits = pygame.sprite.spritecollide(self.player)
         
 
     def draw(self):

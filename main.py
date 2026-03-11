@@ -31,7 +31,9 @@ class MainProgram:
         self.root.destroy()
         """this variable is where the questions are stored as a dictionary and 
         is then passed into the quiz game class/instance as a parameter to be e used"""
-        dict = {} # temporary   
+        dict = {# temporary  dict 
+            '1' : {'Question':"What is 70 - 3?",'A':'sixty-five','B':'sixty-four','C':'sixty-six','D':'sixty-seven'}
+        }  
         print("running game")
         game = QuizGame(dict)
         game.run()
