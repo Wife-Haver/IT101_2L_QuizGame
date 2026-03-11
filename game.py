@@ -1,61 +1,60 @@
-import tkinter as tk 
-from PIL import Image, ImageTk
+import tkinter as tk
+import pygame
 
+from player import Player
 
+WHITE = (255, 255, 255)
+FPS = 60
 
 class QuizGame:
-    def __init__(self):
-        self.root = tk.Tk()
-        self.root.geometry('800x600')
+    def __init__(self, q):
+        self.questions = q  # the dictionary is then received and stored
+        self.SCREENWIDTH = 800
+        self.SCREENHEIGHT = 600
 
-        self.canvas = tk.Canvas(self.root, width=500, height=500, bg='white')
-        self.canvas.pack()
+        pygame.init()
+        self.screen = pygame.display.set_mode((self.SCREENWIDTH, self.SCREENHEIGHT))
+        pygame.display.set_caption('Quiz Game')
+        self.running = True
+        self.clock = pygame.time.Clock()
 
-        self.spaceshipImg = Image.open('assets/ship.png')
-        self.spaceshipImg = self.spaceshipImg.resize((40,40))
-        self.spaceshipSprite = ImageTk.PhotoImage(self.spaceshipImg)
-
-        self.spaceship = self.canvas.create_image(250,250,image=self.spaceshipSprite,tags = 'player')
-
-        #movement speed
-        self.speed = 10
-
-
-        # Track pressed keys
-        self.keys_pressed = set()
-
-        self.root.bind('<KeyPress>', self.key_press)
-        self.root.bind('<KeyRelease>', self.key_release)
+        self.initialize()
         
-        self.move_loop()
-        
-        # Ensure canvas gets focus for key events
-        self.canvas.focus_set()
-        
-    def key_press(self, event):
-        self.keys_pressed.add(event.keysym.lower())
-        
-    def key_release(self, event):
-        self.keys_pressed.discard(event.keysym.lower())
+    def initialize(self):
+        self.playerSpriteGroup = pygame.sprite.Group()
+        self.player = Player(400, 300)
+        self.playerSpriteGroup.add(self.player)
 
-    def move_loop(self):
-        dx = 0
-        dy = 0
+    def handle_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+
+    def update(self):
+        keys = pygame.key.get_pressed()
+
+        self.player.handle_input(keys)
+        self.playerSpriteGroup.update()
         
-        if 'w' in self.keys_pressed:
-            dy = -self.speed
-        if 's' in self.keys_pressed:
-            dy = self.speed
-        if 'a' in self.keys_pressed:
-            dx = -self.speed
-        if 'd' in self.keys_pressed:
-            dx = self.speed
-            
-        if dx != 0 or dy != 0:
-            self.canvas.move('player', dx, dy)
-            
-        self.root.after(20, self.move_loop)
 
-game = QuizGame()
+    def draw(self):
+        # clear screen
+        self.screen.fill(WHITE)
 
-game.root.mainloop()
+        self.playerSpriteGroup.draw(self.screen)
+
+        pygame.display.flip()
+
+    def run(self):
+        while self.running:
+            self.handle_events()
+            self.update()
+            self.draw()
+            self.clock.tick(FPS)
+        pygame.quit()
+
+    
+# dih = {}
+# g = QuizGame(dih)
+
+# g.run()
