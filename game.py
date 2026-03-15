@@ -32,9 +32,17 @@ class QuizGame:
     
     def init_enemies(self):
         amtOfEnemies = 4
+
+        # Spread enemies evenly around the screen center
+        spacing = 150
+        center_x = self.SCREENWIDTH // 2
+        start_x = center_x - (amtOfEnemies - 1) * spacing // 2
+        y = self.SCREENHEIGHT // 2 - 100  # spawn near vertical center
+
         for i in range(amtOfEnemies):
-            self.enemy = Enemy()
-            self.enemiesSpriteGroup.add(self.enemy)
+            x = start_x + i * spacing
+            enemy = Enemy(i,x, y)
+            self.enemiesSpriteGroup.add(enemy)
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -55,6 +63,7 @@ class QuizGame:
         self.screen.fill(WHITE)
 
         self.playerSpriteGroup.draw(self.screen)
+        self.enemiesSpriteGroup.draw(self.screen)
 
         pygame.display.flip()
 
