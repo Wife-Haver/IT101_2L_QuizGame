@@ -1,5 +1,7 @@
 import pygame
 from os.path import join
+from bullets import Bullet,PlayerBullet,EnemyBullet
+
 
 PLAYER_SPEED = 7
 
@@ -22,6 +24,11 @@ class Player(pygame.sprite.Sprite):
         # movement variables
         self.speed = PLAYER_SPEED
         self.direction = pygame.math.Vector2(0, 0)
+
+        # shooting cooldown (milliseconds)
+        self.shoot_cooldown = 500
+        # allow shooting immediately on start
+        self._last_shot_time = -self.shoot_cooldown
     
     def update(self):
         # update player position based on direction
@@ -46,17 +53,30 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_DOWN] or keys[pygame.K_s]:
             self.direction.y = 1
 
+        bullet = None
         if keys[pygame.K_SPACE]:
-            #s TODO hoot 
-            pass
+            bullet = self.shoot()
         
-        # normalize diagonal movement forconsistent speed
+        # normalize diagonal movement for consistent speed
         if self.direction.length() > 0:
             self.direction.normalize_ip()
-        
-        # def shoot():
-        #     bullet = 
 
+        # return a bullet when fired, otherwise None
+        return bullet
+
+
+    def shoot(self):
+        # Only allow shooting once per cooldown interval
+        now = pygame.time.get_ticks()
+        if now - self._last_shot_time < self.shoot_cooldown:
+            return None
+
+        self._last_shot_time = now
+
+        # Spawn bullet from the top-center of the player
+        bullet_x = self.rect.centerx
+        bullet_y = self.rect.top
+        return PlayerBullet(bullet_x, bullet_y)
 
 
 def transformScaleKeepRatio(image, size):

@@ -3,7 +3,7 @@ import pygame
 
 from player import Player
 from enemy import Enemy
-from bullet import Bullet
+from bullets import Bullet
 
 WHITE = (255, 255, 255)
 FPS = 60
@@ -26,6 +26,9 @@ class QuizGame:
         self.playerSpriteGroup = pygame.sprite.Group()
         self.player = Player(400, 300)
         self.playerSpriteGroup.add(self.player)
+
+        # bullets fired by the player
+        self.bulletsSpriteGroup = pygame.sprite.Group()
         
         self.enemiesSpriteGroup = pygame.sprite.Group()
         self.init_enemies()
@@ -52,11 +55,16 @@ class QuizGame:
     def update(self):
         keys = pygame.key.get_pressed()
 
-        self.player.handle_input(keys)
-        self.playerSpriteGroup.update()
+        # Player movement + shooting
+        bullet = self.player.handle_input(keys)
+        if bullet:
+            self.bulletsSpriteGroup.add(bullet)
 
-        #hits = pygame.sprite.spritecollide(self.player)
-        
+        self.playerSpriteGroup.update()
+        self.bulletsSpriteGroup.update()
+
+        # remove enemies when hit by bullets
+        pygame.sprite.groupcollide(self.bulletsSpriteGroup, self.enemiesSpriteGroup, True, True)
 
     def draw(self):
         # clear screen
@@ -64,6 +72,7 @@ class QuizGame:
 
         self.playerSpriteGroup.draw(self.screen)
         self.enemiesSpriteGroup.draw(self.screen)
+        self.bulletsSpriteGroup.draw(self.screen)
 
         pygame.display.flip()
 
@@ -75,8 +84,3 @@ class QuizGame:
             self.clock.tick(FPS)
         pygame.quit()
 
-    
-# dih = {}
-# g = QuizGame(dih)
-
-# g.run()
