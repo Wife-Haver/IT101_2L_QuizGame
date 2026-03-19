@@ -4,82 +4,94 @@ import pygame
 import sys
 
 from game import QuizGame
+from parsefile import parse_quiz_file
+
 
 class MainProgram:
     def __init__(self):
         self.root = tk.Tk()
-        self.root.title("Tite")
+        self.root.title("Program")
         self.root.geometry('800x600')
+
+        # Store quiz data here
+        self.quiz_data = None
 
         self.place_ui()
     
     def place_ui(self):
-        mainFrame = ttk.Frame(self.root,padding=10)
-        mainFrame.pack(fill=tk.BOTH,expand=True)
+        mainFrame = ttk.Frame(self.root, padding=10)
+        mainFrame.pack(fill=tk.BOTH, expand=True)
 
-        label = ttk.Label(mainFrame,text='Tkinter Window',padding=10)
+        label = ttk.Label(mainFrame, text='Tkinter Window', padding=10)
         label.pack(pady=20)
 
-        button = ttk.Button(mainFrame,text='RUN GAME',command=self.run_game)
+        # Load File Button
+        load_button = ttk.Button(
+            mainFrame,
+            text='LOAD QUIZ FILE',
+            command=self.load_quiz
+        )
+        load_button.pack(pady=10)
 
-        button.pack()
+        # Run Game Button
+        run_button = ttk.Button(
+            mainFrame,
+            text='RUN GAME',
+            command=self.run_game
+        )
+        run_button.pack(pady=10)
     
+    def load_quiz(self):
+        """Opens file dialog and loads quiz into memory"""
+        self.quiz_data = parse_quiz_file()
+
+        if self.quiz_data:
+            print("Quiz loaded successfully!")
+        else:
+            print("No quiz loaded.")
+
     def run_ui(self):
         self.root.mainloop()
 
     def run_game(self):
-        self.root.destroy()
-        """this variable is where the questions are stored as a dictionary and 
-        is then passed into the quiz game class/instance as a parameter to be e used"""
-
-        quiz = {
-            "q1": {
-                "question": "What keyword is used to define a function in Python?",
-                "A": "func",
-                "B": "define",
-                "C": "def",
-                "D": "function",
-                "correct": "C"
-            },
-            "q2": {
-                "question": "Which data type is used to store text in Python?",
-                "A": "int",
-                "B": "str",
-                "C": "bool",
-                "D": "float",
-                "correct": "B"
-            },
-            "q3": {
-                "question": "Which symbol is used to write a comment in Python?",
-                "A": "//",
-                "B": "<!-- -->",
-                "C": "#",
-                "D": "**",
-                "correct": "C"
-            },
-            "q4": {
-                "question": "What function is used to display output in Python?",
-                "A": "echo()",
-                "B": "write()",
-                "C": "display()",
-                "D": "print()",
-                "correct": "D"
-            },
-            "q5": {
-                "question": "Which data structure uses square brackets in Python?",
-                "A": "Tuple",
-                "B": "Dictionary",
-                "C": "List",
-                "D": "Set",
-                "correct": "C"
+        if not self.quiz_data:
+            print("No quiz loaded! Using default quiz.")
+            
+            # fallback quiz
+            quiz = {
+                "q1": {
+                    "question": "What keyword is used to define a function in Python?",
+                    "A": "func",
+                    "B": "define",
+                    "C": "def",
+                    "D": "function",
+                    "correct": "C"
+                }
             }
-        }
-        # endregion 
+        else:
+            # Convert parsed format → game format
+            quiz = {}
+
+            for i, q_data in self.quiz_data.items():
+                question_text = list(q_data.keys())[0]
+                answers = q_data[question_text]
+
+                quiz[f"q{i}"] = {
+                    "question": question_text,
+                    "A": answers.get("A"),
+                    "B": answers.get("B"),
+                    "C": answers.get("C"),
+                    "D": answers.get("D"),
+                    "correct": answers.get("Correct")
+                }
+
         print("running game")
+        self.root.destroy()
+
         game = QuizGame(quiz)
         game.run()
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     app = MainProgram()
     app.run_ui()
-

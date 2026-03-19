@@ -1,0 +1,59 @@
+1. What keyword is used to define a function in Python?
+
+A. func
+
+B. define
+
+C. def
+
+D. function
+
+Correct: C
+-
+2. Which data type is used to store text in Python?
+
+A. int
+
+B. str
+
+C. bool
+
+D. float
+
+Correct: B
+-
+3. Which symbol is used to write a comment in Python?
+
+A. //
+
+B. <!-- -->
+
+C. #
+
+D. **
+
+Correct: C
+-
+4. What function is used to display output in Python?
+
+A. echo()
+
+B. write()
+
+C. display()
+
+D. print()
+
+Correct: D
+-
+5. Which data structure uses square brackets in Python?
+
+A. Tuple
+
+B. Dictionary
+
+C. List
+
+D. Set
+
+Correct: C
