@@ -23,7 +23,7 @@ class Bullet(pygame.sprite.Sprite):
 
     def handle_input(self):
         pass
-
+#ww
 class PlayerBullet(Bullet):
     def __init__(self, x, y):
         super().__init__(x, y)  

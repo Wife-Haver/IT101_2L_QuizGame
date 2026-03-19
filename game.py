@@ -13,6 +13,9 @@ class QuizGame:
         self.questions = q  # the dictionary is then received and stored
         self.SCREENWIDTH = 800
         self.SCREENHEIGHT = 600
+        self.current_question_index = 0
+        self.question_keys = list(self.questions.keys())
+        self.current_correct_answer = None
 
         pygame.init()
         self.screen = pygame.display.set_mode((self.SCREENWIDTH, self.SCREENHEIGHT))
@@ -32,6 +35,28 @@ class QuizGame:
         
         self.enemiesSpriteGroup = pygame.sprite.Group()
         self.init_enemies()
+        
+        # Display the first question
+        self.display_question()
+    
+    def display_question(self):
+        """Display the current question and its choices"""
+        if self.current_question_index >= len(self.question_keys):
+            print("\n=== Quiz Complete! ===")
+            self.running = False
+            return
+        
+        question_key = self.question_keys[self.current_question_index]
+        question_data = self.questions[question_key]
+        
+        print(f"\n=== Question {self.current_question_index + 1} ===")
+        print(f"{question_data['question']}")
+        print(f"Enemy A: {question_data['A']}")
+        print(f"Enemy B: {question_data['B']}")
+        print(f"Enemy C: {question_data['C']}")
+        print(f"Enemy D: {question_data['D']}")
+        
+        self.current_correct_answer = question_data['correct']
     
     def init_enemies(self):
         amtOfEnemies = 4
@@ -63,9 +88,38 @@ class QuizGame:
         self.playerSpriteGroup.update()
         self.bulletsSpriteGroup.update()
 
-        # remove enemies when hit by bullets
-        pygame.sprite.groupcollide(self.bulletsSpriteGroup, self.enemiesSpriteGroup, True, True)
+        # Handle collisions - each bullet should only resolve one enemy, once.
+        bullets_to_remove = []
+        enemy_hit_correct = False
 
+        for bullet in list(self.bulletsSpriteGroup):
+            hit_enemies = pygame.sprite.spritecollide(bullet, self.enemiesSpriteGroup, False)
+            if not hit_enemies:
+                continue
+
+            # Only evaluate first collision per bullet to avoid duplicates
+            enemy = hit_enemies[0]
+            enemy_letter = enemy.name[-1]  # Get 'A', 'B', 'C', or 'D'
+
+            if enemy_letter == self.current_correct_answer:
+                print(f"{enemy.name} was hit! Correct!")
+                enemy.kill()  # Remove the enemy
+                enemy_hit_correct = True
+            else:
+                print(f"{enemy.name} was hit! Wrong, try again!")
+
+            bullets_to_remove.append(bullet)
+
+        # Remove bullets that hit enemies
+        for bullet in bullets_to_remove:
+            bullet.kill()
+
+        # If correct hit, advance quiz and reset enemies
+        if enemy_hit_correct:
+            self.current_question_index += 1
+            self.display_question()
+            self.enemiesSpriteGroup.empty()
+            self.init_enemies()
     def draw(self):
         # clear screen
         self.screen.fill(WHITE)
