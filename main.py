@@ -86,9 +86,11 @@ class MainProgram:
                 }
 
         print("running game")
+
+        #removes tkinter window
         self.root.destroy()
 
-        game = QuizGame(quiz)
+        game = QuizGame(quiz) # runs game
         game.run()
 
 
