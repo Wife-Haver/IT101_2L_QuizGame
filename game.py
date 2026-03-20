@@ -22,7 +22,9 @@ class QuizGame:
         pygame.display.set_caption('Quiz Game')
         self.running = True
         self.clock = pygame.time.Clock()
-
+        # font for on-screen quiz text display
+        self.font = pygame.font.SysFont(None, 26)
+        self.question_text_lines = []
         self.initialize()
         
     def initialize(self):
@@ -49,14 +51,67 @@ class QuizGame:
         question_key = self.question_keys[self.current_question_index]
         question_data = self.questions[question_key]
         
-        print(f"\n=== Question {self.current_question_index + 1} ===")
-        print(f"{question_data['question']}")
-        print(f"Enemy A: {question_data['A']}")
-        print(f"Enemy B: {question_data['B']}")
-        print(f"Enemy C: {question_data['C']}")
-        print(f"Enemy D: {question_data['D']}")
+        # print(f"\n=== Question {self.current_question_index + 1} ===")
+        # print(f"{question_data['question']}")
+        # print(f"Enemy A: {question_data['A']}")
+        # print(f"Enemy B: {question_data['B']}")
+        # print(f"Enemy C: {question_data['C']}")
+        # print(f"Enemy D: {question_data['D']}")
         
         self.current_correct_answer = question_data['correct']
+        self.current_question_text = f"{self.current_question_index + 1}. {question_data['question']}"
+        self.current_answer_options = {
+            'A': question_data['A'],
+            'B': question_data['B'],
+            'C': question_data['C'],
+            'D': question_data['D'],
+        }
+
+        # Prepare wrapped content for rendering.
+        self.question_text_lines = [
+            f"Question {self.current_question_index + 1}/{len(self.question_keys)}",
+        ]
+
+        self.question_text_lines.extend(self.wrap_text(self.current_question_text, self.SCREENWIDTH - 20))
+
+        choices_line = (
+            f"A: {self.current_answer_options['A']}    "
+            f"B: {self.current_answer_options['B']}    "
+            f"C: {self.current_answer_options['C']}    "
+            f"D: {self.current_answer_options['D']}"
+        )
+
+        self.question_text_lines.append(self.truncate_text(choices_line, self.SCREENWIDTH - 20))
+
+    def wrap_text(self, text, max_width):
+        words = text.split(' ')
+        lines = []
+        current_line = ''
+
+        for word in words:
+            candidate = f"{current_line} {word}".strip()
+            if self.font.size(candidate)[0] <= max_width:
+                current_line = candidate
+            else:
+                if current_line:
+                    lines.append(current_line)
+                current_line = word
+
+        if current_line:
+            lines.append(current_line)
+
+        return lines
+
+    def truncate_text(self, text, max_width):
+        if self.font.size(text)[0] <= max_width:
+            return text
+
+        ellipsis = '...'
+        candidate = text
+        while candidate and self.font.size(candidate + ellipsis)[0] > max_width:
+            candidate = candidate[:-1]
+
+        return (candidate + ellipsis) if candidate else ellipsis
     
     def init_enemies(self):
         amtOfEnemies = 4
@@ -127,6 +182,21 @@ class QuizGame:
         self.playerSpriteGroup.draw(self.screen)
         self.enemiesSpriteGroup.draw(self.screen)
         self.bulletsSpriteGroup.draw(self.screen)
+
+        # Draw question and answers as text centered with wrap
+        y_offset = 10
+        line_height = 28
+
+        for line in self.question_text_lines:
+            text_surface = self.font.render(line, True, (0, 0, 0))
+            text_rect = text_surface.get_rect(center=(self.SCREENWIDTH // 2, y_offset + line_height // 2))
+            self.screen.blit(text_surface, text_rect)
+            y_offset += line_height
+
+        if self.current_question_index >= len(self.question_keys):
+            complete_surface = self.font.render("Quiz Complete! Well done.", True, (0, 0, 0))
+            complete_rect = complete_surface.get_rect(center=(self.SCREENWIDTH // 2, y_offset + 10 + line_height // 2))
+            self.screen.blit(complete_surface, complete_rect)
 
         pygame.display.flip()
 

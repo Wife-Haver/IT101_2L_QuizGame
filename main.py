@@ -90,6 +90,7 @@ class MainProgram:
 
         game = QuizGame(quiz)
         game.run()
+        sys.exit(0)
 
 
 if __name__ == "__main__":

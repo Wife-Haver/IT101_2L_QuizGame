@@ -32,7 +32,7 @@ def parse_quiz_file():
         parts = block.split('\n\n')
 
         if len(parts) != 6:
-            print("Skipping malformed block:\n", block)
+            # print("Skipping malformed block:\n", block)
             continue
 
         try:
