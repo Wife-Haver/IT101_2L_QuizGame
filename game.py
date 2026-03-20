@@ -1,44 +1,49 @@
-import tkinter as tk
+import tkinter as tk  
 import pygame
 
 from player import Player
 from enemy import Enemy
 from bullets import Bullet
 
-WHITE = (255, 255, 255)
-FPS = 60
+WHITE = (255, 255, 255)  # background color for game window
+FPS = 60  # fixed frame rate for smoother animation
 
+# Main quiz shooter game controller
 class QuizGame:
     def __init__(self, q):
-        self.questions = q  # the dictionary is then received and stored
+        # load questions from parsed input data and track question state
+        self.questions = q
         self.SCREENWIDTH = 800
         self.SCREENHEIGHT = 600
         self.current_question_index = 0
         self.question_keys = list(self.questions.keys())
         self.current_correct_answer = None
 
+        # initialize pygame window and clock
         pygame.init()
         self.screen = pygame.display.set_mode((self.SCREENWIDTH, self.SCREENHEIGHT))
         pygame.display.set_caption('Quiz Game')
         self.running = True
         self.clock = pygame.time.Clock()
-        # font for on-screen quiz text display
+
+        # font and text lines for on-screen rendering
         self.font = pygame.font.SysFont(None, 26)
         self.question_text_lines = []
+
+        # set up sprites and first question
         self.initialize()
         
     def initialize(self):
+        # set up player and sprite groups for rendering/updating
         self.playerSpriteGroup = pygame.sprite.Group()
         self.player = Player(400, 300)
         self.playerSpriteGroup.add(self.player)
 
-        # bullets fired by the player
-        self.bulletsSpriteGroup = pygame.sprite.Group()
-        
-        self.enemiesSpriteGroup = pygame.sprite.Group()
+        self.bulletsSpriteGroup = pygame.sprite.Group()  # active bullets
+        self.enemiesSpriteGroup = pygame.sprite.Group()  # active enemies
+
+        # create the starting enemy layout and first question text
         self.init_enemies()
-        
-        # Display the first question
         self.display_question()
     
     def display_question(self):
@@ -102,7 +107,7 @@ class QuizGame:
 
         return lines
 
-    def truncate_text(self, text, max_width):
+    def truncate_text(self, text, max_width): 
         if self.font.size(text)[0] <= max_width:
             return text
 
@@ -114,6 +119,7 @@ class QuizGame:
         return (candidate + ellipsis) if candidate else ellipsis
     
     def init_enemies(self):
+        # Create and position the enemy targets for the current quiz question
         amtOfEnemies = 4
 
         # Spread enemies evenly around the screen center
@@ -176,9 +182,10 @@ class QuizGame:
             self.enemiesSpriteGroup.empty()
             self.init_enemies()
     def draw(self):
-        # clear screen
+        # clear screen and draw all sprites + text
         self.screen.fill(WHITE)
 
+        # draw sprites behind text
         self.playerSpriteGroup.draw(self.screen)
         self.enemiesSpriteGroup.draw(self.screen)
         self.bulletsSpriteGroup.draw(self.screen)
